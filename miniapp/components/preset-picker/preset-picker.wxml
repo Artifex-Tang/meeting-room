@@ -1,0 +1,12 @@
+<view class="preset-wrap">
+  <view
+    wx:for="{{presets}}"
+    wx:key="key"
+    class="preset-btn {{item.active ? 'active' : ''}} {{item.disabled ? 'disabled' : ''}}"
+    data-key="{{item.key}}"
+    bindtap="selectPreset"
+  >
+    <view class="preset-label">{{item.label}}</view>
+    <view class="preset-time">{{item.startTime}}–{{item.endTime}}</view>
+  </view>
+</view>

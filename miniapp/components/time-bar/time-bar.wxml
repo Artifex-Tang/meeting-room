@@ -1,0 +1,21 @@
+<view class="time-bar">
+  <view class="slots-wrap">
+    <view
+      wx:for="{{slots}}"
+      wx:key="index"
+      class="slot {{item.taken ? 'taken' : ''}} {{item.selected ? 'selected' : ''}} {{!item.taken && !item.selected && !readonly ? 'available' : ''}}"
+      data-index="{{item.index}}"
+      bindtap="onSlotTap"
+      bindtouchstart="onSlotTouchStart"
+      bindtouchmove="onSlotTouchMove"
+      bindtouchend="onSlotTouchEnd"
+    >
+      <view wx:if="{{item.index % 2 === 0}}" class="label">{{item.label}}</view>
+    </view>
+  </view>
+  <view class="legend">
+    <view class="legend-item"><view class="dot available"></view>可用</view>
+    <view class="legend-item"><view class="dot taken"></view>已占用</view>
+    <view class="legend-item"><view class="dot selected"></view>已选</view>
+  </view>
+</view>

@@ -1,0 +1,70 @@
+.launch-wrap {
+  height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #1890ff;
+}
+
+.center {
+  text-align: center;
+  color: #fff;
+}
+
+.logo-text {
+  font-size: 52rpx;
+  font-weight: bold;
+  margin-bottom: 32rpx;
+}
+
+.hint {
+  font-size: 26rpx;
+  opacity: .8;
+  margin-bottom: 32rpx;
+}
+
+.error-text {
+  font-size: 28rpx;
+  margin-bottom: 32rpx;
+  color: #ffe58f;
+}
+
+.btn-retry {
+  background: #fff;
+  color: #1890ff;
+  border-radius: 8rpx;
+  font-size: 28rpx;
+}
+
+.profile-form {
+  width: 600rpx;
+  background: #fff;
+  border-radius: 16rpx;
+  padding: 48rpx 40rpx;
+}
+
+.title {
+  font-size: 36rpx;
+  font-weight: bold;
+  color: #333;
+  margin-bottom: 16rpx;
+  text-align: center;
+}
+
+.input {
+  border: 2rpx solid #d9d9d9;
+  border-radius: 8rpx;
+  padding: 16rpx 20rpx;
+  font-size: 28rpx;
+  margin: 24rpx 0;
+}
+
+.btn-submit {
+  background: #1890ff;
+  color: #fff;
+  border-radius: 8rpx;
+  font-size: 30rpx;
+  height: 88rpx;
+  line-height: 88rpx;
+  width: 100%;
+}

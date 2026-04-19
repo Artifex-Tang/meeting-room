@@ -1,0 +1,70 @@
+<view class="container">
+  <!-- Frequency -->
+  <view class="card">
+    <view class="section-title">重复频率</view>
+    <view class="freq-row">
+      <view class="freq-btn {{frequency === 'DAILY' ? 'active' : ''}}" data-freq="DAILY" bindtap="setFrequency">每天</view>
+      <view class="freq-btn {{frequency === 'WEEKLY' ? 'active' : ''}}" data-freq="WEEKLY" bindtap="setFrequency">每周</view>
+      <view class="freq-btn {{frequency === 'MONTHLY' ? 'active' : ''}}" data-freq="MONTHLY" bindtap="setFrequency">每月</view>
+    </view>
+
+    <!-- Weekday selector -->
+    <view wx:if="{{frequency === 'WEEKLY'}}" class="weekday-row">
+      <view
+        wx:for="{{weekdayOptions}}"
+        wx:key="value"
+        class="wd-btn {{weekdays.indexOf(item.value) >= 0 ? 'active' : ''}}"
+        data-value="{{item.value}}"
+        bindtap="toggleWeekday"
+      >{{item.label}}</view>
+    </view>
+
+    <!-- Month day selector -->
+    <view wx:if="{{frequency === 'MONTHLY'}}" class="month-row">
+      <text>每月第</text>
+      <picker mode="selector" range="{{[1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28]}}" value="{{monthDay - 1}}" bindchange="onMonthDayChange">
+        <view class="picker-val">{{monthDay}}</view>
+      </picker>
+      <text>天</text>
+    </view>
+  </view>
+
+  <!-- Date range -->
+  <view class="card">
+    <view class="section-title">日期范围</view>
+    <view class="date-row">
+      <picker mode="date" value="{{startDate}}" bindchange="onStartDateChange">
+        <view class="date-pick">{{startDate || '开始日期'}}</view>
+      </picker>
+      <text class="dash">至</text>
+      <picker mode="date" value="{{endDate}}" bindchange="onEndDateChange">
+        <view class="date-pick">{{endDate || '结束日期'}}</view>
+      </picker>
+    </view>
+    <view wx:if="{{estimatedCount > 0}}" class="estimate">预计生成约 {{estimatedCount}} 次预订</view>
+  </view>
+
+  <!-- Time -->
+  <view class="card">
+    <view class="section-title">每次时间段</view>
+    <view class="time-row">
+      <picker mode="time" value="{{startTime}}" bindchange="onStartTimeChange">
+        <view class="time-pick">{{startTime}}</view>
+      </picker>
+      <text class="dash">–</text>
+      <picker mode="time" value="{{endTime}}" bindchange="onEndTimeChange">
+        <view class="time-pick">{{endTime}}</view>
+      </picker>
+    </view>
+  </view>
+
+  <!-- Title -->
+  <view class="card">
+    <view class="section-title">会议主题（可选）</view>
+    <input class="title-input" placeholder="输入会议主题" value="{{title}}" bindinput="onTitleInput" maxlength="50" />
+  </view>
+
+  <button class="btn-submit" disabled="{{submitting}}" bindtap="onSubmit">
+    {{submitting ? '提交中…' : '创建周期预订'}}
+  </button>
+</view>

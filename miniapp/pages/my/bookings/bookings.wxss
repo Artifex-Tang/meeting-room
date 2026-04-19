@@ -1,0 +1,20 @@
+.tab-row { display: flex; background: #fff; border-radius: 12rpx; margin-bottom: 20rpx; overflow: hidden; }
+.tab {
+  flex: 1; text-align: center; padding: 20rpx;
+  font-size: 28rpx; color: #666;
+}
+.tab.active { color: #1890ff; border-bottom: 4rpx solid #1890ff; font-weight: bold; }
+
+.hint { text-align: center; color: #999; margin-top: 100rpx; font-size: 28rpx; }
+
+.booking-card { cursor: pointer; }
+.booking-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12rpx; }
+.booking-title { font-size: 30rpx; font-weight: bold; color: #333; flex: 1; }
+.booking-info { display: flex; flex-direction: column; gap: 8rpx; color: #666; font-size: 26rpx; }
+.booking-actions { margin-top: 16rpx; }
+.btn-cancel {
+  background: #fff; color: #ff4d4f; border: 2rpx solid #ff4d4f;
+  border-radius: 8rpx; font-size: 26rpx; padding: 0 24rpx;
+  height: 64rpx; line-height: 64rpx;
+}
+.cancel-reason { margin-top: 8rpx; font-size: 24rpx; color: #fa8c16; }

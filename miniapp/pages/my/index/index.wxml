@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="card user-card">
+    <view class="avatar-wrap">
+      <image class="avatar" src="{{userInfo.avatar_url || '/assets/icons/default-avatar.png'}}" mode="aspectFill" />
+    </view>
+    <view class="user-info">
+      <view class="nickname">{{userInfo.nickname || '微信用户'}}</view>
+      <view class="real-name">{{userInfo.real_name || '未设置真实姓名'}}</view>
+    </view>
+  </view>
+
+  <view class="card">
+    <view wx:if="{{!editing}}">
+      <view class="profile-row">
+        <text class="label">真实姓名</text>
+        <text>{{userInfo.real_name || '—'}}</text>
+      </view>
+      <button class="btn-edit" bindtap="startEdit">修改姓名</button>
+    </view>
+    <view wx:else>
+      <view class="section-title">修改真实姓名</view>
+      <input class="name-input" placeholder="输入真实姓名" value="{{realName}}" bindinput="onRealNameInput" maxlength="20" />
+      <button class="btn-save {{saving ? 'disabled' : ''}}" disabled="{{saving}}" bindtap="saveProfile">
+        {{saving ? '保存中…' : '保存'}}
+      </button>
+    </view>
+  </view>
+
+  <button class="btn-logout" bindtap="onLogout">退出登录</button>
+</view>

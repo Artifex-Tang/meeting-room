@@ -1,0 +1,67 @@
+.time-bar {
+  padding: 8rpx 0;
+}
+
+.slots-wrap {
+  display: flex;
+  flex-direction: column;
+}
+
+.slot {
+  height: 40rpx;
+  border-bottom: 1rpx solid #f0f0f0;
+  position: relative;
+  transition: background .1s;
+}
+
+.slot.available {
+  background: #e6f7ff;
+}
+
+.slot.taken {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
+
+.slot.selected {
+  background: #1890ff;
+}
+
+.label {
+  position: absolute;
+  left: 8rpx;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 20rpx;
+  color: #666;
+  pointer-events: none;
+  white-space: nowrap;
+}
+
+.slot.selected .label {
+  color: #fff;
+}
+
+.legend {
+  display: flex;
+  gap: 24rpx;
+  margin-top: 12rpx;
+  font-size: 22rpx;
+  color: #888;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.dot {
+  width: 20rpx;
+  height: 20rpx;
+  border-radius: 4rpx;
+}
+
+.dot.available { background: #e6f7ff; border: 1rpx solid #91d5ff; }
+.dot.taken     { background: #f5f5f5; border: 1rpx solid #d9d9d9; }
+.dot.selected  { background: #1890ff; }

@@ -1,0 +1,7 @@
+{
+  "navigationBarTitleText": "预订会议室",
+  "usingComponents": {
+    "time-bar": "/components/time-bar/time-bar",
+    "preset-picker": "/components/preset-picker/preset-picker"
+  }
+}

@@ -1,0 +1,32 @@
+<view class="container">
+  <view wx:if="{{room}}" class="card room-info">
+    <view class="room-name">{{room.name}}</view>
+    <view class="room-meta">📍 {{room.location || '—'}} · 👥 {{room.capacity || '—'}} 人</view>
+    <view wx:if="{{room.facilities}}" class="room-fac">🔧 {{room.facilities}}</view>
+    <view wx:if="{{room.description}}" class="room-desc">{{room.description}}</view>
+  </view>
+
+  <view class="card">
+    <view class="section-title">选择日期</view>
+    <picker mode="date" value="{{selectedDate}}" bindchange="onDateChange">
+      <view class="date-pick-btn">📅 {{selectedDate}}</view>
+    </picker>
+  </view>
+
+  <view class="card">
+    <view class="section-title">当日占用情况</view>
+    <view wx:if="{{loading}}" class="hint">加载中…</view>
+    <time-bar
+      wx:else
+      taken-slots="{{takenSlots}}"
+      selected-start="{{-1}}"
+      selected-end="{{-1}}"
+      readonly="{{true}}"
+    />
+  </view>
+
+  <view class="action-row">
+    <button class="btn-book" bindtap="goBook">预订此会议室</button>
+    <button class="btn-recurrence" bindtap="goRecurrence">周期预订</button>
+  </view>
+</view>

@@ -1,0 +1,31 @@
+<view class="container">
+  <view class="tab-row">
+    <view class="tab {{statusTab === 'active' ? 'active' : ''}}" data-tab="active" bindtap="switchTab">进行中</view>
+    <view class="tab {{statusTab === 'all' ? 'active' : ''}}" data-tab="all" bindtap="switchTab">全部</view>
+  </view>
+
+  <view wx:if="{{loading}}" class="hint">加载中…</view>
+  <view wx:elif="{{bookings.length === 0}}" class="hint">暂无预订记录</view>
+
+  <view
+    wx:for="{{bookings}}"
+    wx:key="id"
+    class="card booking-card"
+  >
+    <view class="booking-header" bindtap="goDetail" data-id="{{item.id}}">
+      <view class="booking-title">{{item.title || '（无主题）'}}</view>
+      <view class="booking-status tag {{item.status ? 'tag-success' : 'tag-info'}}">
+        {{item.status ? '正常' : '已取消'}}
+      </view>
+    </view>
+    <view class="booking-info" bindtap="goDetail" data-id="{{item.id}}">
+      <text>🏢 会议室 #{{item.room_id}}</text>
+      <text>📅 {{item.date}}</text>
+      <text>🕐 {{item.start_at.slice(11,16)}} – {{item.end_at.slice(11,16)}}</text>
+    </view>
+    <view wx:if="{{item.status === 1}}" class="booking-actions">
+      <button class="btn-cancel" data-id="{{item.id}}" bindtap="cancelBooking">取消预订</button>
+    </view>
+    <view wx:if="{{item.cancel_reason}}" class="cancel-reason">取消原因：{{item.cancel_reason}}</view>
+  </view>
+</view>

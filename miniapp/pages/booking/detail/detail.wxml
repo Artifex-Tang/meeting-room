@@ -1,0 +1,26 @@
+<view class="container">
+  <view wx:if="{{loading}}" class="hint">加载中…</view>
+  <view wx:elif="{{booking}}" class="card">
+    <view class="row"><text class="label">会议主题</text><text>{{booking.title || '（无）'}}</text></view>
+    <view class="row"><text class="label">会议室</text><text>#{{booking.room_id}}</text></view>
+    <view class="row"><text class="label">日期</text><text>{{booking.date}}</text></view>
+    <view class="row">
+      <text class="label">时间</text>
+      <text>{{booking.start_at.slice(11,16)}} – {{booking.end_at.slice(11,16)}}</text>
+    </view>
+    <view class="row">
+      <text class="label">状态</text>
+      <view class="tag {{booking.status ? 'tag-success' : 'tag-info'}}">
+        {{booking.status ? '正常' : '已取消'}}
+      </view>
+    </view>
+    <view wx:if="{{booking.cancel_reason}}" class="row">
+      <text class="label">取消原因</text><text>{{booking.cancel_reason}}</text>
+    </view>
+    <view wx:if="{{booking.recurrence_id}}" class="row">
+      <text class="label">周期ID</text><text>#{{booking.recurrence_id}}</text>
+    </view>
+
+    <button wx:if="{{booking.status === 1}}" class="btn-cancel" bindtap="cancelBooking">取消此预订</button>
+  </view>
+</view>

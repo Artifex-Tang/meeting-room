@@ -1,0 +1,91 @@
+# docker-compose.yml
+#
+# 用法：
+#   cp .env.example .env          # 首次
+#   docker compose up -d mysql redis     # 仅起基础设施（开发期常用）
+#   docker compose up -d                 # 全部起（含后端镜像）
+#   docker compose logs -f backend       # 看后端日志
+#   docker compose down                  # 停止
+#   docker compose down -v               # 停止并清除数据（谨慎）
+
+services:
+  mysql:
+    image: mysql:8.0.39
+    container_name: meeting-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      TZ: Asia/Shanghai
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-time-zone=+08:00
+      - --transaction-isolation=READ-COMMITTED
+      # READ-COMMITTED 避免 gap lock 在冲突检测中造成意外阻塞；
+      # 本系统的串行化保证靠 SELECT ... FOR UPDATE 的行锁，不靠隔离级别。
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./backend/docker/mysql-init:/docker-entrypoint-initdb.d:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  redis:
+    image: valkey/valkey:8
+    container_name: meeting-redis
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes", "--requirepass", "${REDIS_PASSWORD}"]
+    ports:
+      - "${REDIS_PORT:-6379}:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "-a", "${REDIS_PASSWORD}", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: meeting-backend
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      # 容器内连接容器，host 走 compose 服务名
+      DATABASE_URL: mysql+pymysql://${MYSQL_USER}:${MYSQL_PASSWORD}@mysql:3306/${MYSQL_DATABASE}?charset=utf8mb4
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRE_HOURS_USER: ${JWT_EXPIRE_HOURS_USER:-168}
+      JWT_EXPIRE_HOURS_ADMIN: ${JWT_EXPIRE_HOURS_ADMIN:-2}
+      WECHAT_APPID: ${WECHAT_APPID}
+      WECHAT_SECRET: ${WECHAT_SECRET}
+      WECHAT_MOCK: ${WECHAT_MOCK:-false}
+      INIT_ADMIN_USERNAME: ${INIT_ADMIN_USERNAME:-admin}
+      INIT_ADMIN_PASSWORD: ${INIT_ADMIN_PASSWORD:-admin123}
+      RUN_SCHEDULER: ${RUN_SCHEDULER:-true}
+      TZ: Asia/Shanghai
+      LOG_LEVEL: ${LOG_LEVEL:-INFO}
+    ports:
+      - "${BACKEND_PORT:-8000}:8000"
+    volumes:
+      # 开发期挂载源码以便热重载（生产请移除这一行，走镜像内代码）
+      - ./backend:/app
+    command: ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--reload"]
+
+volumes:
+  mysql_data:
+  redis_data:

@@ -1,0 +1,30 @@
+<view class="container">
+  <view class="search-bar">
+    <input
+      class="search-input"
+      placeholder="搜索会议室"
+      value="{{keyword}}"
+      bindinput="onKeywordInput"
+      bindconfirm="onSearch"
+    />
+    <button class="search-btn" bindtap="onSearch">搜索</button>
+  </view>
+
+  <view wx:if="{{loading}}" class="hint">加载中…</view>
+  <view wx:elif="{{rooms.length === 0}}" class="hint">暂无可用会议室</view>
+
+  <view
+    wx:for="{{rooms}}"
+    wx:key="id"
+    class="card room-card"
+    bindtap="goDetail"
+    data-id="{{item.id}}"
+  >
+    <view class="room-name">{{item.name}}</view>
+    <view class="room-meta">
+      <text>📍 {{item.location || '—'}}</text>
+      <text>👥 容纳 {{item.capacity || '—'}} 人</text>
+    </view>
+    <view wx:if="{{item.facilities}}" class="room-facilities">🔧 {{item.facilities}}</view>
+  </view>
+</view>

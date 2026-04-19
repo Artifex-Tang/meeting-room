@@ -1,0 +1,46 @@
+<view class="container">
+  <view class="card">
+    <view class="section-title">日期：{{date}}</view>
+  </view>
+
+  <!-- Mode switch -->
+  <view class="card">
+    <view class="mode-switch">
+      <view class="mode-btn {{mode === 'preset' ? 'active' : ''}}" data-mode="preset" bindtap="switchMode">预设时段</view>
+      <view class="mode-btn {{mode === 'custom' ? 'active' : ''}}" data-mode="custom" bindtap="switchMode">自定义</view>
+    </view>
+  </view>
+
+  <!-- Preset picker -->
+  <view wx:if="{{mode === 'preset'}}" class="card">
+    <preset-picker
+      selected="{{selectedPreset}}"
+      taken-slots="{{takenSlots}}"
+      bind:change="onPresetChange"
+    />
+  </view>
+
+  <!-- Custom time bar -->
+  <view wx:if="{{mode === 'custom'}}" class="card">
+    <view class="hint-text">点击格子选择开始，再次点击扩展或重置</view>
+    <time-bar
+      taken-slots="{{takenSlots}}"
+      selected-start="{{customStart}}"
+      selected-end="{{customEnd}}"
+      bind:slotTap="onSlotTap"
+    />
+    <view wx:if="{{customStart >= 0}}" class="selected-range">
+      已选：{{customStart >= 0 ? 'slot' : ''}}
+    </view>
+  </view>
+
+  <!-- Title -->
+  <view class="card">
+    <view class="section-title">会议主题（可选）</view>
+    <input class="title-input" placeholder="输入会议主题" value="{{title}}" bindinput="onTitleInput" maxlength="50" />
+  </view>
+
+  <button class="btn-submit {{submitting ? 'disabled' : ''}}" bindtap="onSubmit" disabled="{{submitting}}">
+    {{submitting ? '提交中…' : '确认预订'}}
+  </button>
+</view>

@@ -1,0 +1,40 @@
+# ---------- 环境 ----------
+.env
+.env.local
+.env.*.local
+
+# ---------- Python ----------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+.coverage
+htmlcov/
+.venv/
+venv/
+
+# ---------- Node / 前端 ----------
+node_modules/
+dist/
+dist-ssr/
+.vite/
+*.local
+
+# ---------- 小程序 ----------
+miniapp/project.private.config.json
+miniapp/miniprogram_npm/
+
+# ---------- IDE ----------
+.vscode/
+.idea/
+*.swp
+.DS_Store
+
+# ---------- Docker 持久化（compose 外的裸挂载目录） ----------
+docker-data/
+
+# ---------- 日志 ----------
+*.log
+logs/
