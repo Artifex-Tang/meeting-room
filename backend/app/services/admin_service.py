@@ -393,3 +393,32 @@ def _require_dept(db: Session, dept_id: int) -> Department:
     if dept is None:
         raise BusinessException(40401, "部门不存在")
     return dept
+
+
+# ── Audit logging ─────────────────────────────────────────────────────────────
+
+def write_op_log(
+    db: Session,
+    actor_type: int,
+    actor_id: int,
+    action: str,
+    target_type: str | None = None,
+    target_id: int | None = None,
+    payload: dict | None = None,
+) -> None:
+    """Write an operation log entry; failures are swallowed so they never block callers."""
+    from app.models.notify import OperationLog
+    try:
+        log = OperationLog(
+            actor_type=actor_type,
+            actor_id=actor_id,
+            action=action,
+            target_type=target_type,
+            target_id=target_id,
+            payload=payload,
+        )
+        db.add(log)
+        db.commit()
+    except Exception:
+        logger.exception("write_op_log failed: action=%s actor=%d", action, actor_id)
+        db.rollback()

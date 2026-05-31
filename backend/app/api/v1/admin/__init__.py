@@ -27,6 +27,8 @@ from app.services import admin_service
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+_ACTOR_ADMIN = 2
+
 
 def _serialize_booking(b) -> dict:
     return {
@@ -67,6 +69,7 @@ def admin_create_room(
     db: Session = Depends(get_db),
 ) -> dict:
     room = admin_service.create_room(db, req)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "room.create", "room", room.id, {"name": room.name})
     return ok(RoomOut.model_validate(room).model_dump())
 
 
@@ -74,20 +77,22 @@ def admin_create_room(
 def admin_update_room(
     room_id: int,
     req: RoomUpdateRequest,
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> dict:
     room = admin_service.update_room(db, room_id, req)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "room.update", "room", room_id)
     return ok(RoomOut.model_validate(room).model_dump())
 
 
 @router.delete("/rooms/{room_id}", summary="停用会议室（软删）")
 def admin_delete_room(
     room_id: int,
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> dict:
     admin_service.delete_room(db, room_id)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "room.disable", "room", room_id)
     return ok({"room_id": room_id})
 
 
@@ -115,6 +120,7 @@ def admin_grant_users(
     db: Session = Depends(get_db),
 ) -> dict:
     admin_service.grant_users(db, room_id, req.user_ids, admin.id)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "perm.grant_user", "room", room_id, {"user_ids": req.user_ids})
     return ok({"room_id": room_id, "granted_users": req.user_ids})
 
 
@@ -122,10 +128,11 @@ def admin_grant_users(
 def admin_revoke_user(
     room_id: int,
     user_id: int,
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> dict:
     admin_service.revoke_user(db, room_id, user_id)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "perm.revoke_user", "room", room_id, {"user_id": user_id})
     return ok({"room_id": room_id, "user_id": user_id})
 
 
@@ -137,6 +144,7 @@ def admin_grant_depts(
     db: Session = Depends(get_db),
 ) -> dict:
     admin_service.grant_depts(db, room_id, req.dept_ids, admin.id)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "perm.grant_dept", "room", room_id, {"dept_ids": req.dept_ids})
     return ok({"room_id": room_id, "granted_depts": req.dept_ids})
 
 
@@ -144,10 +152,11 @@ def admin_grant_depts(
 def admin_revoke_dept(
     room_id: int,
     dept_id: int,
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> dict:
     admin_service.revoke_dept(db, room_id, dept_id)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "perm.revoke_dept", "room", room_id, {"dept_id": dept_id})
     return ok({"room_id": room_id, "dept_id": dept_id})
 
 
@@ -182,10 +191,11 @@ def admin_list_users(
 def admin_update_user(
     user_id: int,
     req: UserUpdateRequest,
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> dict:
     user = admin_service.update_user(db, user_id, req)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "user.update", "user", user_id)
     return ok(UserOut.model_validate(user).model_dump())
 
 
@@ -203,10 +213,11 @@ def admin_list_departments(
 @router.post("/departments", summary="创建部门")
 def admin_create_department(
     req: DeptCreateRequest,
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> dict:
     dept = admin_service.create_department(db, req)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "dept.create", "department", dept.id, {"name": dept.name})
     return ok(DeptOut.model_validate(dept).model_dump())
 
 
@@ -214,20 +225,22 @@ def admin_create_department(
 def admin_update_department(
     dept_id: int,
     req: DeptUpdateRequest,
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> dict:
     dept = admin_service.update_department(db, dept_id, req)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "dept.update", "department", dept_id)
     return ok(DeptOut.model_validate(dept).model_dump())
 
 
 @router.delete("/departments/{dept_id}", summary="删除部门")
 def admin_delete_department(
     dept_id: int,
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> dict:
     admin_service.delete_department(db, dept_id)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "dept.delete", "department", dept_id)
     return ok({"dept_id": dept_id})
 
 
@@ -259,6 +272,10 @@ def admin_cancel_booking(
     db: Session = Depends(get_db),
 ) -> dict:
     b = admin_service.admin_cancel_booking(db, booking_id, admin.id, req.reason)
+    admin_service.write_op_log(
+        db, _ACTOR_ADMIN, admin.id, "book.cancel", "booking", booking_id,
+        {"reason": req.reason},
+    )
     return ok(_serialize_booking(b))
 
 
@@ -283,10 +300,12 @@ def admin_get_config(
 @router.put("/config", summary="更新系统参数")
 def admin_update_config(
     req: ConfigUpdateRequest,
-    _: AdminUser = Depends(get_current_admin),
+    admin: AdminUser = Depends(get_current_admin),
     db: Session = Depends(get_db),
 ) -> dict:
-    return ok(admin_service.update_config(db, req))
+    result = admin_service.update_config(db, req)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "config.update")
+    return ok(result)
 
 
 # ── Admin self ────────────────────────────────────────────────────────────────
@@ -298,4 +317,5 @@ def admin_change_password(
     db: Session = Depends(get_db),
 ) -> dict:
     admin_service.change_admin_password(db, admin.id, req.old_password, req.new_password)
+    admin_service.write_op_log(db, _ACTOR_ADMIN, admin.id, "admin.change_password", "admin_user", admin.id)
     return ok({"message": "密码修改成功"})

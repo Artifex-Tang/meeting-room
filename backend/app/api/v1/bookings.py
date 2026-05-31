@@ -3,6 +3,7 @@ from datetime import date as DateType
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 
+from app.core.rate_limit import check_rate
 from app.core.response import ok
 from app.core.timezone import utc_to_shanghai
 from app.deps import get_current_user, get_db
@@ -29,6 +30,7 @@ def create_booking(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> dict:
+    check_rate(f"book:{current_user.id}", limit=30, window=60)
     booking = booking_service.create(db, current_user.id, req)
     return ok(_serialize(booking))
 
