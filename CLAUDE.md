@@ -9,7 +9,7 @@
 这是一个会议室预订系统，包含三个工程：
 
 - `backend/` — Python 3.11 + FastAPI + MySQL 8 + Redis（可选）+ APScheduler（订阅消息调度）
-- `miniapp/` — 微信原生小程序（员工端）
+- `MeetingGo/` — 微信原生小程序（员工端）
 - `admin-web/` — Vue 3 + Vite + Element Plus（管理端）
 
 完整需求、数据库、接口、算法、消息通知、初始化约定写在仓库根目录的 `SPEC.md`。**它是唯一权威来源**，与本文件冲突时以 SPEC.md 为准。
@@ -153,7 +153,7 @@ meeting-room/
 ├── .env.example          # 环境变量模板
 ├── .gitignore
 ├── backend/
-├── miniapp/
+├── MeetingGo/
 └── admin-web/
 ```
 

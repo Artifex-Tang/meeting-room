@@ -55,7 +55,7 @@ npm run dev
 
 ### 5. 小程序
 
-用微信开发者工具打开 `miniapp/` 目录。在 `miniapp/config.js` 里把 `BASE_URL` 指向后端地址（本地开发时需要配置"不校验合法域名"）。
+用微信开发者工具打开 `MeetingGo/` 目录。在 `MeetingGo/config.js` 里把 `BASE_URL` 指向后端地址（本地开发时需要配置"不校验合法域名"）。
 
 ## 目录结构
 
@@ -73,7 +73,7 @@ meeting-room/
 │   ├── tests/
 │   ├── Dockerfile
 │   └── requirements.txt
-├── miniapp/                # 微信原生小程序
+├── MeetingGo/              # 微信原生小程序
 └── admin-web/              # Vue 3 管理端
 ```
 

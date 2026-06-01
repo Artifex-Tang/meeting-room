@@ -364,7 +364,7 @@ npm install element-plus @element-plus/icons-vue axios
 **目录结构**（按 SPEC §7.4）
 
 ```
-miniapp/
+MeetingGo/
 ├── app.js / app.json / app.wxss
 ├── config.js                    # BASE_URL
 ├── utils/
@@ -476,7 +476,7 @@ miniapp/
 ### config 键名对齐
 
 - 后端使用 `cancel_advance_hours`（小时），小程序误用 `cancel_deadline_minutes`（分钟），两处都修正：
-  - `miniapp/pages/my/bookings/bookings.js`：读 `cancel_advance_hours` × 60
+  - `MeetingGo/pages/my/bookings/bookings.js`：读 `cancel_advance_hours` × 60
   - `admin-web/src/pages/settings/SettingsPage.vue`：form key 改为 `cancel_advance_hours`
 
 ### config 键集合扩充
