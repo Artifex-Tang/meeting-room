@@ -195,3 +195,50 @@ uvicorn app.main:app --reload            # 起后端（APScheduler 随之启动�
 - 调度器：APScheduler + DB 轮询，多副本部署靠 `RUN_SCHEDULER` 开关避免重复发送
 - 限流：in-memory 计数器（`app/core/rate_limit.py`）；登录 5次/min/IP+账号，预订 30次/min/用户；单实例足够，多实例部署需换 Redis 实现
 - 审计日志：`admin_service.write_op_log()` 写 `operation_log`；所有管理员写操作（room/user/dept/perm/booking/config/password）均已接入；失败只记录日志不影响主流程
+- 小程序目录名：`MeetingGo/`（从 `miniapp/` 改名）
+- 管理界面范围：**不做小程序内嵌管理端**（包体积上限 2MB + 小屏体验差 + ROI 低），维持独立 admin-web
+- 多租户：行级隔离方案已评估（~25 文件改动），**暂不实现**，方案存档于 `.claude/projects/…/memory/project_multitenant_plan.md`
+- Docker 容器命名：统一使用 `mr-` 前缀（`mr-mysql` / `mr-redis` / `mr-backend`），端口 3307 / 6380 / 8001 避让宿主机其他服务
+- Dockerfile 精简：PyMySQL 是纯 Python 驱动，**不需要** `build-essential` / `default-libmysqlclient-dev`；`cryptography` / `bcrypt` 均有预编译 wheel；只需 `tzdata`
+
+---
+
+## 9. 已知 Bug 修复记录
+
+> 供后续会话参考，避免重复踩坑。
+
+| 编号 | 问题 | 修复位置 |
+|---|---|---|
+| BUG-01 | `POST /notify/subscribe-report` 响应只有 `{updated:true}`，不含配额 | `app/api/v1/notify.py` + `notify_service.report_subscribe()` 改为返回 `{quota:{...}}` |
+| BUG-02 | `GET /notify/quota` 端点不存在 | `app/api/v1/notify.py` 新增端点 |
+| BUG-03 | `BookingOut` schema 缺 `cancel_source` / `cancelled_by` 字段 | `app/schemas/booking.py` |
+| BUG-04 | `admin-web/src/App.vue` 保留 Vite 默认模板，页面左侧显示 "You did it!" | 清理为仅 `<RouterView />` |
+| BUG-05 | `MeetingGo/app.json` tabBar 引用的图标文件不存在，`auto-preview` 失败 | 创建 `MeetingGo/assets/icons/*.png` 占位图标 |
+| BUG-06 | `MeetingGo/project.private.config.json` `urlCheck:true` 阻断模拟器对 `localhost` 的请求 | 改为 `false`（开发模式专用） |
+
+---
+
+## 10. 测试套件说明
+
+> 当前共 93 个测试用例，全部通过。详细说明见 `tests/TEST_DESCRIPTION.md`，报告见 `tests/TEST_REPORT.md`。
+
+| 套件 | 文件 | 用例数 | 覆盖范围 |
+|---|---|---|---|
+| 小程序 HTTP 流 | `tests/miniapp_flow_test.py` | 59 | 7 个页面模块完整请求流，含冲突/限流/权限错误路径 |
+| 管理端浏览器 | `C:\Temp\browser_test.py` (Playwright) | 12 | 登录→改密→各功能页→探针 |
+| 小程序模拟器 | `tests/miniapp_simulator_test.js` | 22 | 微信开发者工具自动化，7 页面 data 验证 + 网络探针 |
+
+**运行前置条件**：
+- Docker 后端 `http://localhost:8001`，`WECHAT_MOCK=true`
+- 模拟器测试需先执行：`cli.bat auto-preview --project MeetingGo --auto-port 9420` + `cli.bat auto ...`
+- 测试使用随机日期偏移（`_OFFSET ∈ [500, 900]`天）+ 唯一命名房间防跨次数据冲突
+
+---
+
+## 11. 暂缓功能清单
+
+| 功能 | 状态 | 启动条件 |
+|---|---|---|
+| 多租户（行级隔离） | 方案已存档，代码未动 | 有多组织使用需求时，参考 memory 目录方案 |
+| 限流改 Redis 实现 | in-memory 暂用 | 部署多副本时替换 `app/core/rate_limit.py` |
+| admin-web PWA 化 | 未做 | 需移动端管理时，加 `viewport` + 媒体查询即可 |
