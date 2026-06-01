@@ -46,10 +46,11 @@ _access_token_cache: dict = {}
 
 # ── Subscribe report (T-BE-17) ────────────────────────────────────────────────
 
-def report_subscribe(db: Session, user_id: int, results: dict[str, str]) -> None:
+def report_subscribe(db: Session, user_id: int, results: dict[str, str]) -> dict[str, int]:
     """
     Update notify_quota based on wx.requestSubscribeMessage results.
     results = {"booking_success": "accept"|"reject"|"ban", ...}
+    Returns the current quota for all affected template keys.
     """
     quota_cap = get_int(db, "notify_quota_cap", 10)
     for template_key, status in results.items():
@@ -65,6 +66,13 @@ def report_subscribe(db: Session, user_id: int, results: dict[str, str]) -> None
         else:
             db.add(NotifyQuota(user_id=user_id, template_key=template_key, quota=1))
     db.commit()
+    return get_quota(db, user_id)
+
+
+def get_quota(db: Session, user_id: int) -> dict[str, int]:
+    """Return remaining quota per template key for user."""
+    rows = db.query(NotifyQuota).filter(NotifyQuota.user_id == user_id).all()
+    return {r.template_key: r.quota for r in rows}
 
 
 # ── Enqueueing (T-BE-19) ──────────────────────────────────────────────────────

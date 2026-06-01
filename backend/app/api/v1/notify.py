@@ -20,5 +20,14 @@ def subscribe_report(
     current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ) -> dict:
-    notify_service.report_subscribe(db, current_user.id, req.results)
-    return ok({"updated": True})
+    quota = notify_service.report_subscribe(db, current_user.id, req.results)
+    return ok({"quota": quota})
+
+
+@router.get("/quota", summary="查询当前用户订阅配额")
+def get_quota(
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+) -> dict:
+    quota = notify_service.get_quota(db, current_user.id)
+    return ok({"quota": quota})

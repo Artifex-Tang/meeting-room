@@ -36,6 +36,8 @@ class BookingOut(BaseModel):
     attendees: str | None = None
     status: int
     cancel_reason: str | None = None
+    cancelled_by: int | None = None
+    cancel_source: int | None = None   # 1=user self / 2=admin
     cancelled_at: datetime | None = None
 
     model_config = {"from_attributes": True}
